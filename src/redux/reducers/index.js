@@ -9,7 +9,12 @@ const initialState = {
   // dividiamo per ragioni organizzative lo state in SLICES (fette)
   cart: {
     content: [], // all'inizio non abbiamo libri nel carrello
+    // ready: true,
   },
+  //   user: {
+  //     blabla: true,
+  //   },
+  // immaginiamo di avere uno stato complesso
 }
 
 // alla prima invocazione di mainReducer (che avviene al caricamento della pagina) state è undefined (non esiste ancora!); diamo come valore di default del parametro state il nostro oggetto "initialState"
@@ -21,8 +26,44 @@ const mainReducer = (state = initialState, action) => {
 
   switch (action.type) {
     // qui inseriamo tutte le possibili casistiche
-    // case blabla1
-    // case blabla2
+    case 'ADD_TO_CART':
+      // qui dentro fornisco istruzioni al mio reducer su COSA FARE
+      // quando intercetta una action con type "ADD_TO_CART"
+      return {
+        // devo SEMPRE ritornare un oggetto, il nuovo stato dell'app
+        ...state,
+        // andiamo a riscrivere la slice di nostro interesse
+        cart: {
+          ...state.cart,
+          //   vado a ri-dichiarare "content" prestando attenzione a NON utilizzare metodi e tecniche che andrebbero ad alterare il valore di state, perchè in una funzione pura non si possono mutare i propri parametri
+          content: state.cart.content.concat(action.payload),
+          // NON POTETE USARE PUSH (perchè modifica l'array di partenza e di fatto ROMPE la funzione pura!)
+          //   content: [...state.cart.content, action.payload]
+        },
+      }
+
+    case 'REMOVE_FROM_CART':
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          content: state.cart.content.filter((book, i) => {
+            if (i === action.payload) {
+              return false
+            } else {
+              return true
+            }
+          }),
+          // PRO VERSION
+          //   content: state.cart.content.filter((_, i) => i !== action.payload),
+          // METODO ALTERNATIVO CON SLICE
+          //   content: [
+          //     ...state.cart.content.slice(0, action.payload),
+          //     ...state.cart.content.slice(action.payload + 1),
+          //   ],
+        },
+      }
+
     default:
       // finiamo qui dentro se l'action.type non corrisponde a nessuno dei case stabiliti precedentemente
       return state
